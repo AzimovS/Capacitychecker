@@ -4,11 +4,23 @@ from telegram.ext.filters import Filters
 import requests
 import re
 # from utils import *
-
+import urllib
 import logging
 import telegram
-
+import wget
+import os
+import tabula
+import sqlite3
+import threading
 from dbhelper import DBHelper
+
+TOKEN = "776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA"
+URL = "https://api.telegram.org/bot{}/".format(TOKEN)
+
+def get_url(url):
+    response = requests.get(url)
+    content = response.content.decode("utf8")
+    return content
 
 def start(bot, update):
 	start_msg = """
@@ -67,6 +79,43 @@ def delete(bot, update):
 	db.delete_item(courseCode, chat)
 	update.message.reply_text("I deleted " + courseCode + " from the list")
 
+def download():
+	url = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421&schoolid=11"
+	filename = wget.download(url)
+	print("newschedule was downloaded")
+	os.rename("school_schedule_by_term.pdf", "newschedule.pdf")
+
+def checkcapacity(name, section, schedule):
+	df = tabula.read_pdf(schedule, pages = "all")
+	newdf = df.loc[df["Course Abbr"] == name]
+	if newdf.size == 0:
+		print("Course was not found")
+	newdf =  newdf.loc[newdf["S/T"] == section]
+	if newdf.size == 0:
+		print("SECTION was not found")
+		return None, None
+	enr = newdf["Enr"]
+	cap = newdf["Cap"]
+	print(enr.item(), cap.item())
+	return enr.item(), cap.item()
+
+def read_db():
+	conn=sqlite3.connect('todo.sqlite')
+	cursor = conn.cursor()
+	cursor.execute("SELECT * FROM items")
+	rows = cursor.fetchall()
+	lst = []
+	for row in rows:
+		lst.append(list(row))
+	return lst
+
+def send_message(chat_id, coursecode, oldcap, newcap):
+	text = "There is a change in " + coursecode + "!!!\n"
+	text += "It changed from " + str(oldcap) + " to " + str(newcap) + "!!!"
+	text = urllib.parse.quote_plus(text)
+	url = URL + "sendMessage?text={}&chat_id={}&parse_mode=Markdown".format(text, chat_id)
+	get_url(url)
+
 
 def main():
 	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
@@ -76,7 +125,18 @@ def main():
 	dispatcher.add_handler(CommandHandler('get_list', get_list))
 	dispatcher.add_handler(CommandHandler('delete', delete))
 	dispatcher.add_handler(CommandHandler('help', help))
-
+	while True:
+		download()
+		lsts = read_db()
+		for lst in lsts:
+			name = lst[0][:8]
+			section = lst[0][9:]
+			print(name , section)
+			oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
+			newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
+			if (oldenr != newenr):
+				send_message(lst[1], coursecode, oldcap, newcap)
+				print("There is a change. Fast Register it")
 	updater.start_polling()
 	updater.idle	
 

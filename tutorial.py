@@ -10,7 +10,7 @@ db = DBHelper()
 
 TOKEN = "776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
-
+urlregistrar = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421"
 
 def get_url(url):
     response = requests.get(url)
