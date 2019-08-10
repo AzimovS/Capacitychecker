@@ -3,11 +3,13 @@ from telegram.ext import Updater, InlineQueryHandler, \
 from telegram.ext.filters import Filters
 import requests
 import re
+from dbhelper import DBHelper
 # from utils import *
 
 import logging
 import telegram
 
+db = DBHelper()
 courseCode = None
 courseSection = None
 
@@ -32,6 +34,8 @@ def set_coursecode(bot, update):
 	print(courseCode)
 	if (len(courseCode) != 8):
 		update.message.reply_text(error_msg)
+		return None
+	update.message.reply_text("Now enter me a section which you want to track, please")
 
 def set_coursesection(bot, update):
 	error_msg = """
@@ -40,16 +44,18 @@ def set_coursesection(bot, update):
 	courseSection = update.message.text[19:]
 	if (len(courseSection)>3 or len(courseSection) < 2):
 		updade.message.reply_text(error_msg)
-	print(courseSection)
+
+
+	
 
 
 def main():
+	db.setup()
 	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
 	dispatcher = updater.dispatcher
 	dispatcher.add_handler(CommandHandler('start', start))
 	dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
 	dispatcher.add_handler(CommandHandler('set_coursesection', set_coursesection))
-
 	updater.start_polling()
 	updater.idle	
 
