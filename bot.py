@@ -77,7 +77,7 @@ def main():
 	dispatcher.add_handler(CommandHandler('delete', delete))
 	dispatcher.add_handler(CommandHandler('help', help))
 
-	updater.start_polling(0.5)
+	updater.start_polling()
 	updater.idle	
 
 
