@@ -106,13 +106,17 @@ def checkcapacity_process():
 		download()
 		lsts = read_db()
 		for lst in lsts:
-			name = lst[0][:8]
-			section = lst[0][9:]
+			if (len(lst[0]) == 11):
+				name = lst[0][:8]
+				section = lst[0][9:]
+			else:
+				name = lst[0][:7]
+				section = lst[0][8:]
 			print(name , section)
 			oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
 			newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
 			if (oldenr != newenr):
-				send_message(lst[1], coursecode, oldcap, newcap)
+				send_message(lst[1], name, oldcap, newcap)
 				print("There is a change. Fast Register it")
 		time.sleep(30)
 
