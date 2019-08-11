@@ -1,4 +1,3 @@
-dlib==19.17.0
 docutils==0.14
 entrypoints==0.3
 et-xmlfile==1.0.1
