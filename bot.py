@@ -138,6 +138,7 @@ def send_message(chat_id, coursecode, oldcap, newcap):
 
 def webhook():
 	bot.remove_webhook()
+	main()
 	bot.set_webhook(url="https://afternoon-journey-24831.herokuapp.com/" + TOKEN)
 	return "!", 200
 
