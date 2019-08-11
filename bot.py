@@ -12,10 +12,12 @@ import os
 import tabula
 import sqlite3
 import threading
+import time
 from dbhelper import DBHelper
 
 TOKEN = "776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
+urlregistrar = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421"
 
 def get_url(url):
     response = requests.get(url)
@@ -80,7 +82,7 @@ def delete(bot, update):
 	update.message.reply_text("I deleted " + courseCode + " from the list")
 
 def download():
-	url = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421&schoolid=11"
+	url = urlregistrar
 	filename = wget.download(url)
 	print("newschedule was downloaded")
 	os.rename("school_schedule_by_term.pdf", "newschedule.pdf")
@@ -100,17 +102,19 @@ def checkcapacity(name, section, schedule):
 	return enr.item(), cap.item()
 
 def checkcapacity_process():
-	download()
-	lsts = read_db()
-	for lst in lsts:
-		name = lst[0][:8]
-		section = lst[0][9:]
-		print(name , section)
-		oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
-		newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
-		if (oldenr != newenr):
-			send_message(lst[1], coursecode, oldcap, newcap)
-			print("There is a change. Fast Register it")
+	while True:
+		download()
+		lsts = read_db()
+		for lst in lsts:
+			name = lst[0][:8]
+			section = lst[0][9:]
+			print(name , section)
+			oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
+			newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
+			if (oldenr != newenr):
+				send_message(lst[1], coursecode, oldcap, newcap)
+				print("There is a change. Fast Register it")
+		time.sleep(30)
 
 def read_db():
 	conn=sqlite3.connect('todo.sqlite')
