@@ -14,13 +14,10 @@ import sqlite3
 import threading
 import time
 from dbhelper import DBHelper
-from flask import Flask, request
 
 TOKEN = "776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA"
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 urlregistrar = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421"
-server = Flask(__name__)
-
 
 def get_url(url):
     response = requests.get(url)
@@ -136,22 +133,23 @@ def send_message(chat_id, coursecode, oldcap, newcap):
 	url = URL + "sendMessage?text={}&chat_id={}&parse_mode=Markdown".format(text, chat_id)
 	get_url(url)
 
-def webhook():
-	bot.remove_webhook()
-	bot.set_webhook(url="https://afternoon-journey-24831.herokuapp.com/" + TOKEN)
-	return "!", 200
 
-updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
-check_capacity = threading.Thread(target = checkcapacity_process, args = ())
-check_capacity.start()
+def main():
+	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
+	check_capacity = threading.Thread(target = checkcapacity_process, args = ())
+	check_capacity.start()
 
-dispatcher = updater.dispatcher
-dispatcher.add_handler(CommandHandler('start', start))
-dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
-dispatcher.add_handler(CommandHandler('get_list', get_list))
-dispatcher.add_handler(CommandHandler('delete', delete))
-dispatcher.add_handler(CommandHandler('help', help))	
+
+
+
+	dispatcher = updater.dispatcher
+	dispatcher.add_handler(CommandHandler('start', start))
+	dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
+	dispatcher.add_handler(CommandHandler('get_list', get_list))
+	dispatcher.add_handler(CommandHandler('delete', delete))
+	dispatcher.add_handler(CommandHandler('help', help))
+	updater.start_polling()	
 
 
 if __name__ == '__main__':
-	server.run(host="0.0.0.0", port = int(os.environ.get('PORT', 5000)))
+	main()
