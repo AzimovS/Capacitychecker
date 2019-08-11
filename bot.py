@@ -138,24 +138,19 @@ def send_message(chat_id, coursecode, oldcap, newcap):
 
 def webhook():
 	bot.remove_webhook()
-	main()
 	bot.set_webhook(url="https://afternoon-journey-24831.herokuapp.com/" + TOKEN)
 	return "!", 200
 
-def main():
-	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
-	check_capacity = threading.Thread(target = checkcapacity_process, args = ())
-	check_capacity.start()
+updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
+check_capacity = threading.Thread(target = checkcapacity_process, args = ())
+check_capacity.start()
 
-
-
-
-	dispatcher = updater.dispatcher
-	dispatcher.add_handler(CommandHandler('start', start))
-	dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
-	dispatcher.add_handler(CommandHandler('get_list', get_list))
-	dispatcher.add_handler(CommandHandler('delete', delete))
-	dispatcher.add_handler(CommandHandler('help', help))	
+dispatcher = updater.dispatcher
+dispatcher.add_handler(CommandHandler('start', start))
+dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
+dispatcher.add_handler(CommandHandler('get_list', get_list))
+dispatcher.add_handler(CommandHandler('delete', delete))
+dispatcher.add_handler(CommandHandler('help', help))	
 
 
 if __name__ == '__main__':
