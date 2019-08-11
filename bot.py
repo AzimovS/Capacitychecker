@@ -99,6 +99,19 @@ def checkcapacity(name, section, schedule):
 	print(enr.item(), cap.item())
 	return enr.item(), cap.item()
 
+def checkcapacity_process():
+	download()
+	lsts = read_db()
+	for lst in lsts:
+		name = lst[0][:8]
+		section = lst[0][9:]
+		print(name , section)
+		oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
+		newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
+		if (oldenr != newenr):
+			send_message(lst[1], coursecode, oldcap, newcap)
+			print("There is a change. Fast Register it")
+
 def read_db():
 	conn=sqlite3.connect('todo.sqlite')
 	cursor = conn.cursor()
@@ -119,26 +132,19 @@ def send_message(chat_id, coursecode, oldcap, newcap):
 
 def main():
 	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
+	check_capacity = threading.Thread(target = checkcapacity_process, args = ())
+	check_capacity.start()
+
+
+
+
 	dispatcher = updater.dispatcher
 	dispatcher.add_handler(CommandHandler('start', start))
 	dispatcher.add_handler(CommandHandler('set_coursecode', set_coursecode))
 	dispatcher.add_handler(CommandHandler('get_list', get_list))
 	dispatcher.add_handler(CommandHandler('delete', delete))
 	dispatcher.add_handler(CommandHandler('help', help))
-	while True:
-		download()
-		lsts = read_db()
-		for lst in lsts:
-			name = lst[0][:8]
-			section = lst[0][9:]
-			print(name , section)
-			oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
-			newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
-			if (oldenr != newenr):
-				send_message(lst[1], coursecode, oldcap, newcap)
-				print("There is a change. Fast Register it")
-	updater.start_polling()
-	updater.idle	
+	updater.start_polling()	
 
 
 if __name__ == '__main__':
