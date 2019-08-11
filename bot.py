@@ -58,7 +58,7 @@ def set_coursecode(bot, update):
 	It seems you did not enter properly courseCode. Please try again!
 	"""
 	courseCode = update.message.text[16: ]
-	if (len(courseCode) < 11 or (len(courseCode) > 22)):
+	if (len(courseCode) < 10 or (len(courseCode) > 22)):
 		update.message.reply_text(error_msg)
 		return None
 	chat = update.message.chat_id
