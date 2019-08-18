@@ -13,9 +13,10 @@ import tabula
 import sqlite3
 import threading
 import time
+from passwords import *
 from dbhelper import DBHelper
 
-TOKEN = "776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA"
+
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 urlregistrar = "http://registrar.nu.edu.kz/registrar_downloads/json?method=printDocument&name=school_schedule_by_term&termid=421"
 
@@ -116,7 +117,7 @@ def checkcapacity_process():
 			oldenr, oldcap = checkcapacity(name, section, "oldschedule.pdf")
 			newenr, newcap = checkcapacity(name, section, "newschedule.pdf")
 			if (oldenr != newenr):
-				send_message(lst[1], name, oldcap, newcap)
+				send_message(lst[1], name, section, oldenr, newenr)
 				print("There is a change. Fast Register it")
 		time.sleep(30)
 
@@ -130,8 +131,8 @@ def read_db():
 		lst.append(list(row))
 	return lst
 
-def send_message(chat_id, coursecode, oldcap, newcap):
-	text = "There is a change in " + coursecode + "!!!\n"
+def send_message(chat_id, name, section, oldcap, newcap):
+	text = "There is a change in " + name + " " +section + " !!!\n"
 	text += "It changed from " + str(oldcap) + " to " + str(newcap) + "!!!"
 	text = urllib.parse.quote_plus(text)
 	url = URL + "sendMessage?text={}&chat_id={}&parse_mode=Markdown".format(text, chat_id)
@@ -139,7 +140,7 @@ def send_message(chat_id, coursecode, oldcap, newcap):
 
 
 def main():
-	updater = Updater(token='776447650:AAFsgQnnNAMJ4ng5KgyHhBE9qOYRVFCJMFA')
+	updater = Updater(TOKEN)
 	check_capacity = threading.Thread(target = checkcapacity_process, args = ())
 	check_capacity.start()
 
