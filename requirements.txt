@@ -1,6 +1,6 @@
 glob2==0.6
 pandas==0.24.2
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pyTelegramBotAPI==3.6.6
 python-telegram-bot==11.1.0
 python3-wget==0.0.2b1
