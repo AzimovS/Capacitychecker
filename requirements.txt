@@ -4,6 +4,6 @@ PyPDF2==1.26.0
 pyTelegramBotAPI==3.6.6
 python-telegram-bot==11.1.0
 python3-wget==0.0.2b1
-requests==2.21.0
+requests==2.31.0
 tables==3.5.1
 tabula-py==1.4.1
